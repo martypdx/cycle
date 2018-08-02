@@ -6,6 +6,7 @@ let token;
 let user;
 let trek;
 let giant;
+let exampleSale;
 
 // eslint-disable-next-line
 let tokenTwo;
@@ -24,9 +25,10 @@ const bikey = {
 };
 
 
-describe('Users API', () => {
+describe.only('Users API', () => {
     beforeEach(() => dropCollection('users'));
     beforeEach(() => dropCollection('bikes'));
+    beforeEach(() => dropCollection('sales'));
 
     beforeEach(() => {
         return request
@@ -77,6 +79,20 @@ describe('Users API', () => {
         }, token)
             .then(bike => giant = bike);      
     });
+
+    beforeEach(() => {
+        return save('sales', 
+            {
+                bike: trek._id,
+                offers: [{
+                    email: user._id,
+                    offer: 50
+                }]
+            }, token)
+            .then(sale => {
+                exampleSale = sale;
+            });
+    });
         
     it('signs up a user', () => {
         assert.isDefined(token);
@@ -112,8 +128,20 @@ describe('Users API', () => {
             .then(checkOk)
             .then(({ body }) => {
                 assert.deepEqual(body, [trek, giant]);     
-            });
+            }); 
     });
+    ////////////
+    it('get all sales from a user', () => {
+        return request
+            .get(`/api/users${userTwo._id}/sales`)
+            .then(checkOk)
+            .then(({ body }) => {
+                console.log('*** body', body);
+            });
+            
+    });
+
+
         
     it('updates a user', () => {
         user.email = 'mongoose666@mongeese.com';
