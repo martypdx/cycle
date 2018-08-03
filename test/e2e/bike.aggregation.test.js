@@ -73,68 +73,76 @@ describe('Bikes Aggregation API', () => {
     });
 
         
-    it('gets bikes by models with price', () => {
+    it('gets bikes by models with price and number available', () => {
         return request
             .get('/api/bikes/models')
             .then(checkOk)
             .then(({ body }) => {
                 assert.deepEqual(body, [{
                     _id : 'Fathom',
+                    available: 1,
                     price: 1400
                 },
                 {
                     _id: 'Emonda',
+                    available: 1,
                     price: 11299
                 }]);
             });
     });
 
-    it('gets bikes by manufacturers with model', () => {
+    it('gets bikes by manufacturers with model and number available', () => {
         return request
             .get('/api/bikes/manufacturers')
             .then(checkOk)
             .then(({ body }) => {
                 assert.deepEqual(body, [{
                     _id : 'Giant',
+                    available: 1,
                     model: 'Fathom'
                 },
                 {
                     _id: 'Trek',
+                    available: 1,
                     model: 'Emonda'
                 }]);
             });
     });
     
-    it('gets bike models by type with price', () => {
+    it('gets bikes by type with model, price, and number available', () => {
         return request
             .get('/api/bikes/types')
             .then(checkOk)
             .then(({ body }) => {
                 assert.deepEqual(body, [{
                     _id : 'trail',
+                    available: 1,
                     model: 'Fathom',
                     price: 1400
                 },
                 {
                     _id: 'road',
+                    available: 1,
                     model: 'Emonda',
                     price: 11299
                 }]);
             });
     });
 
-    it('gets bike models by year with price', () => {
+    it('gets bikes by year with model, price, and number available', () => {
         return request
             .get('/api/bikes/years')
             .then(checkOk)
             .then(({ body }) => {
                 assert.deepEqual(body, [{
                     _id : 2016,
+                    available: 1,
                     model: 'Fathom',
                     price: 1400
                 },
                 {
                     _id: 2017,
+                    available: 1,
                     model: 'Emonda',
                     price: 11299
                 }]);

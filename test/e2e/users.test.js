@@ -2,6 +2,21 @@ const { assert } = require('chai');
 const { request, checkOk, save } = require('./request');
 const { dropCollection } = require('./db');
 
+const saleSimple = (sale, bike) => {
+    const simple = {};
+    simple._id = sale._id;
+    simple.bike = {
+        _id: bike._id,
+        manufacturer: bike.manufacturer,
+        model: bike.model,
+        price: bike.price
+    };
+    simple.offers = sale.offers;
+    simple.sold = sale.sold;
+
+    return simple;
+};
+
 let token;
 let user;
 let trek;
@@ -24,11 +39,12 @@ const bikey = {
     password: 'myFaceIsABike',
 };
 
-
-describe.only('Users API', () => {
-    beforeEach(() => dropCollection('users'));
-    beforeEach(() => dropCollection('bikes'));
-    beforeEach(() => dropCollection('sales'));
+describe('Users API', () => {
+    beforeEach(() => {
+        dropCollection('users');
+        dropCollection('bikes');
+        dropCollection('sales');
+    });
 
     beforeEach(() => {
         return request
@@ -79,16 +95,12 @@ describe.only('Users API', () => {
         }, token)
             .then(bike => giant = bike);      
     });
-
+    
     beforeEach(() => {
         return save('sales', 
             {
                 bike: trek._id,
-                offers: [{
-                    email: user._id,
-                    offer: 50
-                }]
-            }, token)
+            }, tokenTwo)
             .then(sale => {
                 exampleSale = sale;
             });
@@ -107,7 +119,6 @@ describe.only('Users API', () => {
             .get('/api/users')
             .then(checkOk)
             .then(({ body }) => {
-                
                 assert.deepEqual(body, [user, userTwo]);
             });
     });
@@ -123,20 +134,24 @@ describe.only('Users API', () => {
     });
 
     it('it gets all bikes owned by user', () => {
+        delete trek.owner;
+        delete trek.__v;
+        delete giant.owner;
+        delete giant.__v;
         return request
             .get(`/api/users/${userTwo._id}/bikes`)
             .then(checkOk)
             .then(({ body }) => {
-                assert.deepEqual(body, [trek, giant]);     
-            }); 
+                assert.deepEqual(body, [trek, giant]);
+            });
     });
-    ////////////
-    it('get all sales from a user', () => {
+
+    it('it gets all sales owned by user', () => {
         return request
-            .get(`/api/users${userTwo._id}/sales`)
+            .get(`/api/users/${userTwo._id}/sales`)
             .then(checkOk)
             .then(({ body }) => {
-                console.log('*** body', body);
+                assert.deepEqual(body, [saleSimple(exampleSale, trek)]);
             });
             
     });
